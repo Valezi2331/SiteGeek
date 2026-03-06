@@ -41,7 +41,7 @@ setup().then((db) => {
 
     // Rota para Inserção de Dados (POST)
     app.post('/api/leituras', async (req, res) => {
-        const { valor, descricao } = req.body;
+        const { valor, descricao ;} = req.body;
         try {
             await db.run(
                 'INSERT INTO leituras (valor, descricao) VALUES (?, ?)',
@@ -67,3 +67,5 @@ setup().then((db) => {
 }).catch(err => {
     console.error('Erro de Inicialização:', err);
 });
+
+a
