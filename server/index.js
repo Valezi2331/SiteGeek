@@ -39,9 +39,27 @@ setup().then((db) => {
         res.send('Servidor SiteGeek Online.');
     });
 
+    // Rota para RECEBER os dados do formulário React
+    app.post('/salvar', async (req, res) => {
+        const { valor, descricao } = req.body; // Pega os dados enviados pelo Axios
+
+        try {
+            // Insere os dados na tabela que criamos no setup
+            await db.run(
+                'INSERT INTO leituras (valor, descricao) VALUES (?, ?)',
+                [valor, descricao]
+            );
+            
+            res.status(201).json({ message: 'Dados salvos com sucesso no SQLite!' });
+        } catch (error) {
+            console.error('Erro ao salvar no banco:', error);
+            res.status(500).json({ error: 'Erro interno ao salvar os dados.' });
+        }
+    });
+
     // Rota para Inserção de Dados (POST)
     app.post('/api/leituras', async (req, res) => {
-        const { valor, descricao ;} = req.body;
+        const { valor, descricao } = req.body;
         try {
             await db.run(
                 'INSERT INTO leituras (valor, descricao) VALUES (?, ?)',
@@ -68,4 +86,3 @@ setup().then((db) => {
     console.error('Erro de Inicialização:', err);
 });
 
-a

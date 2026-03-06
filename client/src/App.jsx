@@ -12,7 +12,7 @@ function App() {
     
     try {
       // Enviando para a porta 3000 que configuramos no backend
-      const response = await axios.post('http://localhost:3000/salvar', {
+      const _response = await axios.post('http://localhost:3000/salvar', {
         valor: valor,
         descricao: descricao
       });
