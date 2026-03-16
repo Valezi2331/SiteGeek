@@ -5,6 +5,8 @@ import { open } from 'sqlite';
 
 const app = express();
 
+const PortaServidor = process.env.port || 3001;
+
 // Middlewares
 app.use(cors());
 app.use(express.json());
@@ -16,7 +18,7 @@ async function main() {
         driver: sqlite3.Database
     });
 
-    console.log("✅ Banco de dados conectado!");
+    console.log("Banco de dados conectado!");
 
     // Rota para salvar
     app.post('/salvar', async (req, res) => {
@@ -32,8 +34,8 @@ async function main() {
         }
     });
 
-    app.listen(3001, () => {
-        console.log("🚀 Servidor rodando em http://localhost:3001");
+    app.listen(PortaServidor, () => {
+        console.log("Servidor rodando em http://localhost:3001");
     });
 }
 
