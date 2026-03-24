@@ -5,38 +5,66 @@ import { open } from 'sqlite';
 
 const app = express();
 
-const PortaServidor = process.env.port || 3001;
+// Porta 3001 para evitar conflito com o Grafana na 3000
+const PortaServidor = process.env.PORT || 3001;
 
-// Middlewares
+// Middlewares - OBRIGATÓRIOS para o React conseguir enviar dados
 app.use(cors());
 app.use(express.json());
 
 async function main() {
-    // Abrindo o banco no caminho que o Grafana consegue ler
+    // Abre o banco de dados na pasta do servidor
     const db = await open({
-        filename: '/var/lib/sqlite_data/database.sqlite',
+        filename: './database.sqlite', 
         driver: sqlite3.Database
     });
 
-    console.log("Banco de dados conectado!");
+    // Cria a tabela de produtos se ela não existir
+    await db.exec(`
+      CREATE TABLE IF NOT EXISTS produtos (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        nome TEXT NOT NULL,
+        preco REAL NOT NULL,
+        categoria TEXT NOT NULL,
+        imagem_url TEXT,
+        estoque INTEGER DEFAULT 0
+      )
+    `);
 
-    // Rota para salvar
-    app.post('/salvar', async (req, res) => {
-        const { valor, descricao } = req.body;
+    console.log("✅ Banco de dados SiteGeek pronto!");
+
+    // Rota para postar novos produtos (Admin)
+    app.post('/produtos', async (req, res) => {
+        const { nome, preco, categoria, imagem_url, estoque } = req.body;
         try {
             await db.run(
-                'INSERT INTO leituras (valor, descricao) VALUES (?, ?)',
-                [valor, descricao]
+                'INSERT INTO produtos (nome, preco, categoria, imagem_url, estoque) VALUES (?, ?, ?, ?, ?)', 
+                [nome, preco, categoria, imagem_url, estoque || 0]
             );
-            res.status(201).json({ message: 'Salvo com sucesso!' });
+            res.status(201).json({ message: 'Produto Geeks postado com sucesso!' });
+        } catch (err) {
+            console.error("Erro ao salvar:", err.message);
+            res.status(500).json({ error: err.message });
+        }
+    });
+
+    // Rota para o cliente buscar os produtos (Vitrine)
+    app.get('/produtos', async (req, res) => {
+        try {
+            const produtos = await db.all('SELECT * FROM produtos');
+            res.json(produtos);
         } catch (err) {
             res.status(500).json({ error: err.message });
         }
     });
 
+    // Inicializa o servidor
     app.listen(PortaServidor, () => {
-        console.log("Servidor rodando em http://localhost:3001");
+        console.log(`🚀 Servidor rodando em http://localhost:${PortaServidor}`);
     });
 }
 
-main();
+// Chamar a função principal
+main().catch(err => {
+    console.error("Erro ao iniciar o servidor:", err);
+});
