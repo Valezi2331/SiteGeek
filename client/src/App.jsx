@@ -1,42 +1,20 @@
-import { useState } from 'react';
-import axios from 'axios';
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import Home from './pages/Home';
+import Admin from './pages/Admin';
 
 function App() {
-  const [valor, setValor] = useState('');
-  const [descricao, setDescricao] = useState('');
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      // Envia para o seu servidor na porta 3001
-      await axios.post('http://localhost:3001/salvar', {
-        valor: valor,
-        descricao: descricao
-      });
-      alert('Dados salvos com sucesso!');
-      setValor('');
-      setDescricao('');
-    } catch (error) {
-      console.error('Erro ao enviar:', error);
-      alert('Erro ao conectar com o servidor.');
-    }
-  };
-
   return (
-    <div style={{ padding: '50px', textAlign: 'center' }}>
-      <h1>Painel SiteGeek</h1>
-      <form onSubmit={handleSubmit} style={{ display: 'inline-block', textAlign: 'left' }}>
-        <div>
-          <label>Valor:</label><br/>
-          <input type="number" value={valor} onChange={(e) => setValor(e.target.value)} required />
-        </div><br/>
-        <div>
-          <label>Descrição:</label><br/>
-          <textarea value={descricao} onChange={(e) => setDescricao(e.target.value)} required />
-        </div><br/>
-        <button type="submit">Salvar no Banco de Dados</button>
-      </form>
-    </div>
+    <Router>
+      <nav style={{ padding: '15px', background: '#333', color: 'white', display: 'flex', gap: '20px' }}>
+        <Link to="/" style={{ color: 'white', textDecoration: 'none', fontWeight: 'bold' }}>LOJA SITEGEEK</Link>
+        <Link to="/admin" style={{ color: 'white', textDecoration: 'none' }}>POSTAR PRODUTO</Link>
+      </nav>
+
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/admin" element={<Admin />} />
+      </Routes>
+    </Router>
   );
 }
 
